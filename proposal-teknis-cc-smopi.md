@@ -71,22 +71,23 @@ SMOPI baru dibangun sebagai aplikasi web Next.js dengan API backend (Route Handl
 ### 5.2 Diagram Arsitektur Sederhana
 ```mermaid
 flowchart LR
-  U[Pengguna Lapangan\n(Pengamat/Juru/POB)] -->|HTTPS| W[Web SMOPI Baru\nNext.js]
-  W -->|API Route Handlers| A[Backend API\nAuth + RBAC + Blangko]
-  A --> D[(Database\nPostgreSQL + PostGIS*)]
+  U["Pengguna Lapangan(Pengamat/Juru/POB)"] -->|HTTPS| W["Web SMOPI Baru Next.js"]
+  W -->|API Route Handlers| A["Backend API Auth + RBAC + Blangko"]
+  A --> D[("Database PostgreSQL + PostGIS*")]
 
-  subgraph CommandCenter[Command Center BBWS Citanduy]
+  subgraph CommandCenter[sistem cc BBWS Citanduy]
     CCBB[Bigboard/Dashboard]
     CCT[Telemetri API]
   end
 
-  A -->|Fetch Telemetri (API)| CCT
-  A -->|Publish kebutuhan air petak tersier (API/Webhook/Job)| CCBB
+  A -->|Fetch Telemetri API| CCT
+  A -->|Publish kebutuhan air petak tersier API/Webhook/Job| CCBB
 
   A -->|Generate| PDF[PDF Blangko]
-  A -->|Generate (khusus 04-O)| XLS[Excel]
+  A -->|Generate khusus 04-O| XLS[Excel]
 
-  note1[* PostGIS opsional\n(dipakai jika layer GIS memerlukan query spasial)]
+  note1["* PostGIS opsional(dipakai jika layer GIS memerlukan query spasial)"]
+
 ```
 
 ### 5.3 Teknologi dan Komponen Utama
