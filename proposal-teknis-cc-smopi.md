@@ -14,8 +14,9 @@ PT Keen Optima Solution mengusulkan:
 - **Remake aplikasi web SMOPI** (perbaikan UI/UX, navigasi, performa, security, serta perbaikan bug).
 - **Integrasi parsial** antara SMOPI dan Command Center untuk dataset tertentu, dengan prioritas sinkronisasi **debit kebutuhan air pada petak tersier** agar angka pada Command Center konsisten dengan SMOPI.
 - **Integrasi telemetri via API Command Center** untuk mengurangi input manual pada blangko yang membutuhkan data debit (telemetri petak tersier dan telemetri bendung), dengan tetap menyediakan mekanisme penyesuaian manual jika telemetri bermasalah.
+- **Implementasi fitur export Excel** (difokuskan pada Blangko 04-O fase 1) dan cetak PDF untuk blangko-blangko lainnya, guna mengurangi beban kerja manual petugas dalam penyiapan laporan.
 
-Aplikasi akan dibangun sebagai website menggunakan **Next.js**. Untuk peta, digunakan paket yang setara dengan aplikasi “siger” (mis. `@vis.gl/react-google-maps` dan `@turf/turf`). Target durasi pekerjaan: **1 bulan**.
+Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Server Components)** dengan **TypeScript 5.6+**. Target durasi pekerjaan: **1 bulan**.
 
 ---
 
@@ -38,7 +39,7 @@ Aplikasi akan dibangun sebagai website menggunakan **Next.js**. Untuk peta, digu
 
 ## 3. Ruang Lingkup
 ### 3.1 In-Scope
-- Remake aplikasi web SMOPI menggunakan Next.js.
+- Remake aplikasi web SMOPI menggunakan Next.js 15 (App Router + Server Components) dengan TypeScript.
 - Implementasi modul dan blangko sesuai requirement fungsional (Modul 1–14).
 - Integrasi parsial SMOPI → Command Center untuk dataset prioritas: **debit kebutuhan air pada petak tersier**.
 - Integrasi telemetri Command Center → SMOPI melalui API untuk:
@@ -91,21 +92,36 @@ flowchart LR
 ```
 
 ### 5.3 Teknologi dan Komponen Utama
-- Framework: Next.js.
-- UI: komponen modern + tabel/grid yang mendukung input massal.
-- Peta GIS:
-  - `@vis.gl/react-google-maps` untuk rendering peta.
-  - `@turf/turf` untuk operasi geospasial (buffer, intersect, dsb bila diperlukan).
-- Data & integrasi:
-  - Database: PostgreSQL; PostGIS jika diperlukan untuk layer GIS.
-  - Integrasi telemetri: konsumsi API Command Center.
-  - Integrasi dataset kebutuhan air: endpoint/kontrak data untuk Bigboard/Dashboard.
-- Export:
-  - Excel khusus Blangko 04-O menggunakan `exceljs`.
-  - PDF untuk blangko yang mensyaratkan cetak.
-- Keamanan:
-  - Auth + RBAC 4 role (pengamat, juru, POB utama, POB suplesi).
-  - Hardening dan proteksi API.
+
+**Frontend Technology Stack:**
+- **Framework**: Next.js 15 (App Router + Server Components)
+- **Language**: TypeScript 5.6+ (strictly typed)
+- **Styling**: Tailwind CSS 4.0 + CSS Modules
+- **UI Components**: shadcn/ui (primary), Headless UI (fallback), custom (last resort)
+- **Charts**: Recharts (default) → D3.js/Observable Plot (untuk visualisasi kompleks)
+- **Maps**: Google Maps JavaScript API + @react-google-maps/api
+- **Geospatial Operations**: @turf/turf untuk operasi buffer, intersect, dll.
+- **Animations**: Framer Motion + Lottie React
+- **Icons**: Lucide React + Heroicons
+- **PWA**: Next-PWA + Workbox
+
+**Backend Technology Stack:**
+- **Runtime**: Node.js 20+ LTS
+- **Framework**: Next.js 15 Route Handlers (REST API)
+- **Database**: PostgreSQL + Prisma ORM (dengan ekstensi PostGIS untuk data spasial)
+- **Authentication**: NextAuth.js (JWT + Sessions)
+- **Authorization**: Role-based access control (RBAC) untuk 4 role (pengamat, juru, POB utama, POB suplesi)
+- **Validation**: Zod (validasi semua input/output)
+- **API Documentation**: OpenAPI 3.1
+- **Security**: Helmet (untuk microservices terpisah bila ada), CORS, Rate Limiting
+
+**Export & Reporting:**
+- Excel khusus Blangko 04-O menggunakan `exceljs`
+- PDF untuk blangko yang mensyaratkan cetak (menggunakan library rendering PDF yang sesuai)
+
+**Integrasi:**
+- Konsumsi API telemetri Command Center
+- Publikasi endpoint/kontrak data debit kebutuhan air untuk Bigboard/Dashboard Command Center
 
 ---
 
