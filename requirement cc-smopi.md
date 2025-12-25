@@ -120,7 +120,6 @@ fungsional requirement:
 Baris: Kategori tanaman utama (Padi, Tebu, Palawija).
 Kolom: Jenis penyebab kerusakan (Kekeringan, Genangan/Kebanjiran).
 Input Luas Kerusakan: Sistem menyediakan kolom input angka (number stepper) yang dapat diedit pada setiap sel untuk mengisi luas lahan yang rusak (biasanya dalam Ha).
-Nilai Default: Sistem secara otomatis menampilkan nilai yang diambil dari telemetri pada semua kolom input untuk mempercepat pengisian jika tidak ada kerusakan, namun nilai ini tetap bisa diubah manual oleh pengguna.
 - sistem harus menyediakan input form terkait penanggung jawab laporan dan tanggal laporan.
 - sistem harus menyediakan fitur cetak pdf dan excel.
  
@@ -173,6 +172,7 @@ fungsional requirement:
 - Sistem menampilkan tabel dengan hierarki baris berdasarkan Nama Bangunan Kontrol (Bagi/Sadap) dan menampilkan informasi Petak Tersier terkait
 - Sistem harus menampilkan kolom debit harian yang sudah terisi otomatis (pre-filled) dengan nilai dari database (Backend), namun kolom tersebut harus tetap dapat diedit/diubah manual oleh pengguna
 - Sistem harus menghitung ulang Jumlah Debit dan Debit Rata-rata secara otomatis ketika pengguna mengubah nilai default maupun menginput nilai baru.
+Nilai Default: Sistem secara otomatis menampilkan nilai yang diambil dari telemetri pada semua kolom input untuk mempercepat pengisian jika tidak ada kerusakan, namun nilai ini tetap bisa diubah manual oleh pengguna.s
 -  Sistem menyediakan opsi Cara Pengukuran (Radio Button) yang status awalnya (default selection) diambil dari database, namun tetap dapat diubah oleh pengguna.
 - Sistem menyediakan opsi Kondisi Alat Ukur (Radio Button) yang bisa diisi oleh pengguna
 - Sistem menyediakan form isian untuk tanggal dan untuk informasi penanggung jawab

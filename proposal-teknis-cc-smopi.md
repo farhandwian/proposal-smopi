@@ -43,9 +43,8 @@ Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Se
 - Implementasi modul dan blangko sesuai requirement fungsional (Modul 1–14).
 - Integrasi parsial SMOPI → Command Center untuk dataset prioritas: **debit kebutuhan air pada petak tersier**.
 - Integrasi telemetri Command Center → SMOPI melalui API untuk:
-  - Blangko 06-O (telemetri petak tersier, sebagai default/pre-fill realisasi debit).
+  - Blangko 06-O (telemetri petak tersier, sebagai default/pre-fill realisasi debit harian).
   - Blangko 08-O (telemetri bendung, debit sungai).
-  - Default nilai pada tabel kondisi air/kerusakan Blangko 04-O (jika tersedia pada telemetri yang relevan).
 - Perbaikan UI/UX (navigasi, layout tabel, aksesibilitas), performa, security hardening, dan perbaikan bug.
 - Export Excel **difokuskan pada Blangko 04-O** (sesuai kesepakatan fase 1). Untuk blangko lain, fitur keluaran pada fase 1 mengikuti kebutuhan minimal berupa **cetak PDF** sesuai requirement.
 
@@ -154,9 +153,8 @@ Agar integrasi tidak melebar, dataset yang dipublikasikan dari SMOPI minimal mem
 ## 7. Integrasi Telemetri (Command Center API → SMOPI)
 ### 7.1 Tujuan
 - Mengurangi input manual dan menghindari default 0 untuk:
-  - Blangko 06-O (telemetri petak tersier).
-  - Blangko 08-O (telemetri bendung).
-  - Default nilai pada input kondisi air/kerusakan Blangko 04-O (jika telemetri relevan tersedia).
+  - Blangko 06-O (telemetri petak tersier untuk realisasi debit harian).
+  - Blangko 08-O (telemetri bendung untuk debit sungai).
 
 ### 7.2 Mekanisme Fallback
 - Jika telemetri tidak tersedia/rusak/berubah, user tetap dapat mengubah nilai (adjustment) dan sistem menyimpan:
@@ -484,7 +482,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Implement Blangko 04A-O & 04-O (editable grid, filter periode).
 
 ### Minggu 3 — Integrasi Telemetri + Export Excel (04-O)
-- Integrasi telemetri API untuk Blangko 06-O dan 08-O (serta default nilai 04-O jika tersedia).
+- Integrasi telemetri API untuk Blangko 06-O (debit harian petak tersier) dan 08-O (debit sungai bendung).
 - Implement export Excel khusus Blangko 04-O.
 - Implement cetak PDF sesuai kebutuhan blangko terkait.
 
