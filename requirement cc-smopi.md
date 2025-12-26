@@ -304,3 +304,31 @@ fungsional requirement:
 14. modul peta visualisai petak tersier dan pintu air
 fungsional requirement:
 - sistem menampilkan peta yang akan memvisualisasikan petak tersier dan pintu air, menggunakan data gis yang ada
+
+15. modul Progressive Web App (PWA)
+fungsional requirement:
+- sistem harus dapat diinstall sebagai aplikasi di perangkat mobile (iOS dan Android)
+- sistem harus memiliki service worker untuk caching dan performa optimal
+- sistem harus memiliki manifest file untuk instalasi PWA
+- sistem harus responsive dan optimal di berbagai ukuran layar mobile
+
+16. modul integrasi dengan Aplikasi HIGHERTECH (Forecasting Ketersediaan Air)
+functional requirement:
+- sistem harus menyediakan endpoint/API untuk konsumsi aplikasi forecasting milik HIGHERTECH
+- endpoint harus menyediakan data historis debit tersedia (dari Blangko 08-O)
+- endpoint harus menyediakan data kebutuhan air per periode (dari Blangko 05-O, 07-O)
+- endpoint harus menyediakan data luas tanam dan jenis komoditas (dari Blangko 04-O, 10-O)
+- API harus menggunakan autentikasi token
+- dokumentasi API menggunakan OpenAPI 3.1
+- tim Keen Optima Solution akan melakukan modifikasi source code aplikasi HIGHERTECH untuk integrasi dengan SMOPI baru
+
+17. modul integrasi dengan Dashboard OPSHI/Manganti
+fungsional requirement:
+- sistem harus menyediakan endpoint/API untuk konsumsi dashboard OPSHI
+- endpoint harus menyediakan data realisasi tanam per wilayah dan periode (dari Blangko 10-O)
+- endpoint harus menyediakan data debit dan kebutuhan air (dari Blangko 06-O, 07-O, 08-O, 09-O)
+- endpoint harus menyediakan data produksi tanaman dan intensitas tanam (dari Blangko 10-O)
+- endpoint harus menyediakan data kerusakan tanaman (dari Blangko 04-O, 10-O)
+- API harus menggunakan autentikasi token
+- dokumentasi API menggunakan OpenAPI 3.1
+- tim Keen Optima Solution akan melakukan modifikasi source code OPSHI untuk integrasi dengan SMOPI baru

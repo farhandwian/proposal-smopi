@@ -12,17 +12,20 @@ BBWS Citanduy telah memiliki Command Center dengan Bigboard dan Dashboard, namun
 
 PT Keen Optima Solution mengusulkan:
 - **Remake aplikasi web SMOPI** (perbaikan UI/UX, navigasi, performa, security, serta perbaikan bug).
+- **Progressive Web App (PWA)** untuk akses mobile yang optimal, memungkinkan instalasi aplikasi di perangkat mobile.
 - **Integrasi parsial** antara SMOPI dan Command Center untuk dataset tertentu, dengan prioritas sinkronisasi **debit kebutuhan air pada petak tersier** agar angka pada Command Center konsisten dengan SMOPI.
 - **Integrasi telemetri via API Command Center** untuk mengurangi input manual pada blangko yang membutuhkan data debit (telemetri petak tersier dan telemetri bendung), dengan tetap menyediakan mekanisme penyesuaian manual jika telemetri bermasalah.
+- **Integrasi dengan aplikasi forecasting milik HIGHERTECH** dan **dashboard OPSHI** (Manganti) dengan menyediakan API/endpoint data yang diperlukan. Tim Keen Optima Solution akan melakukan modifikasi source code aplikasi HIGHERTECH dan OPSHI agar menggunakan data dari SMOPI baru.
 - **Implementasi fitur export Excel** (difokuskan pada Blangko 04-O fase 1) dan cetak PDF untuk blangko-blangko lainnya, guna mengurangi beban kerja manual petugas dalam penyiapan laporan.
 
-Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Server Components)** dengan **TypeScript 5.6+**. Target durasi pekerjaan: **1 bulan**.
+Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Server Components)** dengan **TypeScript 5.6+**, dan dioptimalkan sebagai **Progressive Web App** untuk mendukung akses mobile. Target durasi pekerjaan: **1 bulan**.
 
 ---
 
 ## 2. Latar Belakang dan Permasalahan
 ### 2.1 Kondisi Saat Ini
-- SMOPI belum terintegrasi dengan Command Center sehingga terdapat perbedaan data (khususnya debit kebutuhan air).
+- SMOPI belum terintegrasi dengan sistem Command Center sehingga terdapat perbedaan data (khususnya debit kebutuhan air).
+- Aplikasi forecasting milik HIGHERTECH dan dashboard OPSHI (Manganti) masih mengambil data dari SMOPI lama yang belum terintegrasi dengan Command Center, sehingga terjadi inkonsistensi data antar sistem.
 - Akses telemetri belum tersedia pada SMOPI sehingga data debit perlu diinput manual (default kosong/0).
 - UI/UX kurang baik, navigasi membingungkan, beberapa tabel terpotong dan menyulitkan pengisian.
 - Performa website lambat.
@@ -40,11 +43,18 @@ Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Se
 ## 3. Ruang Lingkup
 ### 3.1 In-Scope
 - Remake aplikasi web SMOPI menggunakan Next.js 15 (App Router + Server Components) dengan TypeScript.
+- **Implementasi Progressive Web App (PWA)** untuk mendukung:
+  - Instalasi aplikasi di perangkat mobile (iOS/Android).
+  - Notifikasi push (jika diperlukan).
+  - Performa optimal di perangkat mobile.
 - Implementasi modul dan blangko sesuai requirement fungsional (Modul 1–14).
 - Integrasi parsial SMOPI → Command Center untuk dataset prioritas: **debit kebutuhan air pada petak tersier**.
 - Integrasi telemetri Command Center → SMOPI melalui API untuk:
   - Blangko 06-O (telemetri petak tersier, sebagai default/pre-fill realisasi debit harian).
   - Blangko 08-O (telemetri bendung, debit sungai).
+- **Integrasi dengan aplikasi eksternal:**
+  - **Aplikasi forecasting milik HIGHERTECH**: menyediakan endpoint/API untuk data yang diperlukan oleh aplikasi forecasting tersebut, serta modifikasi source code aplikasi HIGHERTECH agar menggunakan SMOPI baru sebagai sumber data.
+  - **Dashboard OPSHI/Manganti**: menyediakan endpoint/API untuk data dashboard, serta modifikasi source code OPSHI agar menggunakan SMOPI baru sebagai sumber data.
 - Perbaikan UI/UX (navigasi, layout tabel, aksesibilitas), performa, security hardening, dan perbaikan bug.
 - Export Excel **difokuskan pada Blangko 04-O** (sesuai kesepakatan fase 1). Untuk blangko lain, fitur keluaran pada fase 1 mengikuti kebutuhan minimal berupa **cetak PDF** sesuai requirement.
 
@@ -64,29 +74,43 @@ Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Se
 
 ## 5. Gambaran Solusi Teknis
 ### 5.1 Arsitektur Sistem (Ringkas)
-SMOPI baru dibangun sebagai aplikasi web Next.js dengan API backend (Route Handlers) dan database terpusat. Integrasi dilakukan ke dua arah secara terpisah:
+SMOPI baru dibangun sebagai aplikasi web Next.js dengan API backend (Route Handlers) dan database terpusat, dioptimalkan sebagai **Progressive Web App (PWA)** untuk akses mobile. Integrasi dilakukan ke beberapa arah:
+
+**Integrasi dengan Command Center:**
 - **SMOPI → Command Center**: publikasi dataset hasil SMOPI (khususnya debit kebutuhan air petak tersier) untuk konsumsi Bigboard/Dashboard.
 - **Command Center → SMOPI**: konsumsi data telemetri via API untuk pre-fill dan efisiensi input.
 
+**Integrasi dengan Aplikasi Eksternal:**
+- **SMOPI → HIGHERTECH**: menyediakan endpoint/API untuk konsumsi aplikasi forecasting milik HIGHERTECH. Tim Keen Optima Solution akan memodifikasi source code aplikasi HIGHERTECH agar menggunakan data dari SMOPI baru (bukan lagi dari SMOPI lama).
+- **SMOPI → OPSHI/Manganti**: menyediakan endpoint/API untuk konsumsi dashboard OPSHI. Tim Keen Optima Solution akan memodifikasi source code OPSHI agar menggunakan data dari SMOPI baru (bukan lagi dari SMOPI lama).
+
 ### 5.2 Diagram Arsitektur Sederhana
 ```mermaid
-flowchart LR
-  U["Pengguna Lapangan(Pengamat/Juru/POB)"] -->|HTTPS| W["Web SMOPI Baru Next.js"]
-  W -->|API Route Handlers| A["Backend API Auth + RBAC + Blangko"]
-  A --> D[("Database PostgreSQL + PostGIS*")]
+flowchart TB
+  U["Pengguna Lapangan<br/>(Pengamat/Juru/POB)"] -->|HTTPS/PWA| W["Web SMOPI Baru<br/>Next.js 15 + PWA"]
+  W -->|API Route Handlers| A["Backend API<br/>Auth + RBAC + Blangko"]
+  A --> D[("Database<br/>PostgreSQL + PostGIS*")]
 
-  subgraph CommandCenter[sistem cc BBWS Citanduy]
-    CCBB[Bigboard/Dashboard]
-    CCT[Telemetri API]
+  subgraph CommandCenter["Command Center BBWS Citanduy"]
+    CCBB["Bigboard/<br/>Dashboard"]
+    CCT["Telemetri API"]
   end
 
-  A -->|Fetch Telemetri API| CCT
-  A -->|Publish kebutuhan air petak tersier API/Webhook/Job| CCBB
+  A -->|Fetch Telemetri| CCT
+  A -->|Publish Data<br/>Kebutuhan Air| CCBB
 
-  A -->|Generate| PDF[PDF Blangko]
-  A -->|Generate khusus 04-O| XLS[Excel]
+  subgraph ExternalApps["Aplikasi Eksternal"]
+    HT["HIGHERTECH<br/>(Forecasting)"]
+    OP["OPSHI<br/>(Dashboard Manganti)"]
+  end
 
-  note1["* PostGIS opsional(dipakai jika layer GIS memerlukan query spasial)"]
+  HT -->|Fetch API: Data Debit,<br/>Kebutuhan Air,<br/>Luas Tanam| A
+  OP -->|Fetch API: Data Realisasi,<br/>Produksi,<br/>Kerusakan| A
+
+  A -->|Generate| PDF["PDF Blangko"]
+  A -->|Generate<br/>khusus 04-O| XLS["Excel"]
+
+  note1["* PostGIS opsional (dipakai jika layer GIS memerlukan query spasial)"]
 
 ```
 
@@ -164,17 +188,56 @@ Agar integrasi tidak melebar, dataset yang dipublikasikan dari SMOPI minimal mem
 
 ---
 
-## 8. Kebutuhan Fungsional (Lengkap)
+## 8. Integrasi dengan Aplikasi Eksternal
+
+### 8.1 Integrasi HIGERTECH (Forecasting Ketersediaan Air)
+**Tujuan:**
+- Menyediakan data SMOPI dari aplikasi baru sebagai sumber untuk aplikasi forecasting ketersediaan air HIGERTECH.
+
+**Implementasi:**
+- Membuat endpoint/API khusus untuk konsumsi HIGERTECH dengan dataset:
+  - Data historis debit tersedia (dari Blangko 08-O).
+  - Data kebutuhan air per periode (dari Blangko 05-O, 07-O).
+  - Data luas tanam dan jenis komoditas (dari Blangko 04-O, 10-O).
+- Modifikasi source code HIGERTECH (dilakukan oleh tim Keen Optima Solution) untuk:
+  - Mengganti integrasi dari SMOPI lama ke SMOPI baru.
+  - Menyesuaikan format data dan endpoint baru.
+  - Testing integrasi end-to-end.
+
+### 8.2 Integrasi Dashboard OPSHI/Manganti
+**Tujuan:**
+- Menyediakan data SMOPI dari aplikasi baru sebagai sumber untuk visualisasi di dashboard OPSHI/Manganti.
+
+**Implementasi:**
+- Membuat endpoint/API khusus untuk konsumsi dashboard OPSHI dengan dataset:
+  - Data realisasi tanam per wilayah dan periode (dari Blangko 10-O).
+  - Data debit dan kebutuhan air (dari Blangko 06-O, 07-O, 08-O, 09-O).
+  - Data produksi tanaman dan intensitas tanam (dari Blangko 10-O).
+  - Data kerusakan tanaman (dari Blangko 04-O, 10-O).
+- Modifikasi source code OPSHI (dilakukan oleh tim Keen Optima Solution) untuk:
+  - Mengganti integrasi dari SMOPI lama ke SMOPI baru.
+  - Menyesuaikan format data dan endpoint baru.
+  - Testing integrasi dan visualisasi dashboard.
+
+### 8.3 Prinsip Integrasi
+- Semua endpoint integrasi menggunakan RESTful API dengan autentikasi token.
+- Data yang dipublikasikan hanya data final/terverifikasi (sesuai dengan business rule yang disepakati).
+- Dokumentasi API lengkap menggunakan OpenAPI 3.1.
+- Versioning API untuk backward compatibility di masa depan.
+
+---
+
+## 9. Kebutuhan Fungsional (Lengkap)
 Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 
-### 8.1 Modul 1 — Authentication dan RBAC
+### 9.1 Modul 1 — Authentication dan RBAC
 **Pekerjaan: Login**
 - Sistem harus menyediakan fitur login.
 
 **Pekerjaan: Tipe user**
 - Sistem harus menyediakan 4 tipe user: pengamat, juru, POB utama, dan POB suplesi.
 
-### 8.2 Modul 2 — Penugasan User / RBAC
+### 9.2 Modul 2 — Penugasan User / RBAC
 **Pekerjaan: Master data (tampilan tabel)**
 - Sistem harus menampilkan:
   - Id Wilayah Pengamat
@@ -192,7 +255,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 **Pekerjaan: List saluran dan bangunan**
 - Sistem menyediakan fitur CRUD untuk saluran dan bangunan.
 
-### 8.3 Modul 3 — Pengaturan
+### 9.3 Modul 3 — Pengaturan
 **Pekerjaan: List bendung utama**
 - Sistem menyediakan fitur CRUD untuk bendung utama.
 
@@ -213,7 +276,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Tombol Aksi & Navigasi:
   - Sistem menyediakan kolom Action yang berisi tombol pintasan pada setiap baris petak tersier, seperti tombol TMT dan Ref Blangko 5 untuk akses cepat.
 
-### 8.4 Modul 4 — Blangko 01-O
+### 9.4 Modul 4 — Blangko 01-O
 **Pekerjaan: Form**
 - Sistem harus menyediakan fitur untuk memilih daerah irigasi dan periode masa tanam.
 
@@ -223,7 +286,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem menyediakan field input untuk mengisi Luas Tanah Usulan pada setiap Masa Tanam.
 - Sistem menampilkan data pada kolom Keputusan Komisi Irigasi.
 
-### 8.5 Modul 5 — Blangko 02-O
+### 9.5 Modul 5 — Blangko 02-O
 **Pekerjaan: List blangko**
 - Sistem harus menyediakan tabel daftar blangko beserta fitur terkait.
 
@@ -251,7 +314,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
   - Total Baris: sistem otomatis menghitung kolom Jumlah untuk memastikan sesuai Luas Sawah Irigasi.
   - Total Wilayah: sistem menjumlahkan seluruh data angka dari semua Mantri pada baris Jumlah Areal Kerja Ranting di bagian paling bawah.
 
-### 8.6 Modul 6 — Blangko 04A-O dan 04-O
+### 9.6 Modul 6 — Blangko 04A-O dan 04-O
 **Pekerjaan: Master data**
 - Sistem harus bisa menyimpan dan menampilkan data berikut:
   - Daerah Irigasi
@@ -283,7 +346,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem menyediakan input form penanggung jawab laporan dan tanggal laporan.
 - Sistem menyediakan fitur cetak PDF dan Excel.
 
-### 8.7 Modul 7 — Blangko 05-O
+### 9.7 Modul 7 — Blangko 05-O
 **Pekerjaan: Master Data**
 - Sistem harus bisa menyimpan dan menampilkan data berikut:
   - Daerah Irigasi
@@ -309,7 +372,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem menyediakan form isian tanggal dan informasi penanggung jawab.
 - Sistem menyediakan fitur cetak PDF.
 
-### 8.8 Modul 8 — Blangko 06-O
+### 9.8 Modul 8 — Blangko 06-O
 **Pekerjaan: Master data**
 - Sistem harus bisa menyimpan dan menampilkan:
   - Daerah Irigasi
@@ -331,7 +394,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem menyediakan form isian tanggal dan informasi penanggung jawab.
 - Sistem menyediakan fitur cetak PDF.
 
-### 8.9 Modul 9 — Blangko 07-O
+### 9.9 Modul 9 — Blangko 07-O
 **Pekerjaan: Master Data**
 - Sistem harus bisa menyimpan dan menampilkan:
   - Daerah Irigasi
@@ -362,7 +425,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem menyediakan isian tanggal, wilayah, serta informasi terkait juru/pengamat.
 - Sistem menyediakan fitur cetak PDF.
 
-### 8.10 Modul 10 — Blangko 08-O
+### 9.10 Modul 10 — Blangko 08-O
 **Pekerjaan: Master Data**
 - Sistem harus bisa menyimpan dan menampilkan:
   - Nama Sungai
@@ -382,7 +445,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem dapat mencetak Blangko 08.
 - Sistem menyediakan fitur verifikasi untuk user pengamat.
 
-### 8.11 Modul 11 — Blangko 09-O
+### 9.11 Modul 11 — Blangko 09-O
 **Pekerjaan: Master Data**
 - Sistem harus bisa menyimpan dan menampilkan:
   - Daerah Irigasi
@@ -399,7 +462,7 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem menampilkan perhitungan faktor K dan telah dikalkulasi.
 - Sistem dapat cetak PDF untuk Blangko 09.
 
-### 8.12 Modul 12 — Blangko 10-O
+### 9.12 Modul 12 — Blangko 10-O
 **Pekerjaan: Tabel List Blangko**
 - Sistem menampilkan pesan peringatan bahwa blangko pendahulu (04A s/d 09) wajib selesai sebelum memproses halaman ini.
 - Sistem menampilkan list tabel data untuk blangko.
@@ -442,39 +505,43 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Sistem mendukung fitur cetak PDF.
 - Sistem menyediakan form isian tanggal dan informasi terkait pengamat/ranting.
 
-### 8.13 Modul 13 — Soil Analyzer (Pengembangan Selanjutnya)
+### 9.13 Modul 13 — Soil Analyzer (Pengembangan Selanjutnya)
 - Sistem bisa otomatis mendeteksi genangan/kebanjiran atau kekeringan (merujuk Blangko 04-O).
 
-### 8.14 Modul 14 — Peta Visualisasi Petak Tersier dan Pintu Air
+### 9.14 Modul 14 — Peta Visualisasi Petak Tersier dan Pintu Air
 - Sistem menampilkan peta untuk memvisualisasikan petak tersier dan pintu air menggunakan data GIS yang ada.
 
 ---
 
-## 9. Kebutuhan Non-Fungsional (Mengacu Tantangan)
-### 9.1 UI/UX dan Usability
+## 10. Kebutuhan Non-Fungsional (Mengacu Tantangan)
+### 10.1 UI/UX dan Usability
+- Progressive Web App (PWA) untuk akses optimal di perangkat mobile.
+- Responsive design yang adaptif untuk berbagai ukuran layar.
 - Navigasi sederhana dan konsisten.
 - Tabel input tidak terpotong; mendukung layar lapangan.
 - User role juru dapat menjalankan workflow utama tanpa kebingungan.
 
-### 9.2 Performa
+### 10.2 Performa
 - Optimasi load data untuk tabel besar (pagination/virtualization).
 - Respons cepat pada input grid (khusus 04A/04-O).
+- PWA caching untuk performa optimal.
 
-### 9.3 Keamanan
+### 10.3 Keamanan
 - RBAC konsisten di UI dan API.
 - Proteksi terhadap akses tanpa kewenangan.
 - Logging aktivitas penting (login, perubahan data kritikal).
+- Secure API endpoints untuk integrasi eksternal (aplikasi HIGHERTECH, OPSHI).
 
-### 9.4 Stabilitas dan Bugfix
+### 10.4 Stabilitas dan Bugfix
 - Perbaikan bug yang sudah teridentifikasi (detail TMT bangunan tidak muncul, duplikasi navbar, halaman list/detail tertentu).
 
 ---
 
-## 10. Rencana Pengerjaan (1 Bulan)
+## 11. Rencana Pengerjaan (1 Bulan)
 ### Minggu 1 — Fondasi & Desain
 - Finalisasi scope, mapping data petak tersier/bendung, dan kontrak integrasi dataset kebutuhan air.
 - Setup arsitektur Next.js, struktur modul, dan RBAC.
-- Desain UI/UX untuk alur input utama blangko.
+- Desain UI/UX untuk alur input utama blangko dengan optimasi mobile/PWA.
 
 ### Minggu 2 — Implementasi Modul Inti & Blangko Prioritas
 - Implement modul authentication + RBAC (4 role).
@@ -486,36 +553,47 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 - Implement export Excel khusus Blangko 04-O.
 - Implement cetak PDF sesuai kebutuhan blangko terkait.
 
-### Minggu 4 — Integrasi SMOPI→Command Center, Hardening, UAT, Handover
+### Minggu 4 — Integrasi Eksternal, Hardening, UAT, Handover
 - Implement publikasi dataset debit kebutuhan air petak tersier untuk Bigboard/Dashboard.
+- Implement endpoint API untuk integrasi aplikasi HIGHERTECH dan OPSHI.
+- Modifikasi source code aplikasi HIGHERTECH dan OPSHI untuk integrasi dengan SMOPI baru.
+- Setup dan konfigurasi PWA (service worker, manifest).
 - Hardening security dan optimasi performa.
 - UAT dengan stakeholder, perbaikan bug, finalisasi dokumentasi.
 
 ---
 
-## 11. Deliverables
+## 12. Deliverables
 - Aplikasi web SMOPI (remake) dengan modul dan blangko sesuai scope.
+- **Progressive Web App (PWA)** yang dapat diinstall di perangkat mobile.
 - Integrasi telemetri (Command Center API → SMOPI) untuk blangko terkait.
 - Integrasi dataset kebutuhan air petak tersier (SMOPI → Command Center).
+- **Integrasi dengan aplikasi HIGHERTECH**: endpoint API dan modifikasi source code aplikasi HIGHERTECH.
+- **Integrasi dengan OPSHI/Manganti**: endpoint API dan modifikasi source code OPSHI.
 - Fitur cetak PDF untuk blangko yang mensyaratkan.
 - Export Excel untuk Blangko 04-O.
 - Dokumen:
-  - Diagram arsitektur & data flow.
+  - Diagram arsitektur & data flow (termasuk integrasi eksternal).
   - Matriks role & akses.
   - Kontrak integrasi dataset kebutuhan air.
-  - Panduan penggunaan singkat.
+  - Dokumentasi API (OpenAPI 3.1) untuk integrasi aplikasi HIGHERTECH dan OPSHI.
+  - Panduan penggunaan aplikasi (web dan mobile/PWA).
 
 ---
 
-## 12. Risiko dan Mitigasi
+## 13. Risiko dan Mitigasi
 - Risiko: Pemetaan ID petak tersier/bendung tidak konsisten antar sistem.
   - Mitigasi: definisikan mapping table dan lakukan validasi awal (sampling) sebelum UAT.
 - Risiko: Telemetri API tidak stabil atau data tidak lengkap.
   - Mitigasi: fallback manual adjustment + pencatatan sumber data.
 - Risiko: Scope blangko sangat luas untuk 1 bulan.
   - Mitigasi: prioritisasi workflow inti (04A/04-O, 06-O, 08-O, integrasi kebutuhan air), dan fasekan fitur non-kritis.
+- Risiko: Akses ke source code aplikasi HIGHERTECH dan OPSHI terbatas atau dokumentasi kurang.
+  - Mitigasi: koordinasi awal dengan tim pemilik aplikasi, request akses repository dan dokumentasi teknis sebelum minggu ke-4.
+- Risiko: Ketergantungan pada fitur browser untuk PWA (terutama iOS Safari).
+  - Mitigasi: testing menyeluruh di berbagai platform, fallback ke web app standar jika PWA tidak didukung penuh.
 
 ---
 
-## 13. Penutup
-Proposal ini dirancang untuk menyelesaikan dua kebutuhan utama BBWS Citanduy: (1) konsistensi data prioritas antara SMOPI dan Command Center (debit kebutuhan air petak tersier), serta (2) peningkatan kualitas SMOPI melalui remake web yang lebih mudah digunakan, lebih cepat, dan lebih aman.
+## 14. Penutup
+Proposal ini dirancang untuk menyelesaikan kebutuhan utama BBWS Citanduy: (1) konsistensi data prioritas antara SMOPI dan Command Center (debit kebutuhan air petak tersier), (2) peningkatan kualitas SMOPI melalui remake web yang lebih mudah digunakan, lebih cepat, dan lebih aman, (3) akses mobile yang optimal melalui Progressive Web App, serta (4) integrasi dengan aplikasi eksternal (aplikasi forecasting milik HIGHERTECH dan dashboard OPSHI) untuk ekosistem pengelolaan sumber daya air yang lebih terintegrasi.

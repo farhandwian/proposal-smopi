@@ -124,7 +124,15 @@ catatan tambahan:
 -tolong pastikan lagi semuanya benar seusai dengan file requirementnya, jika ada yang tidak masuk akal tolong beri tahu saya
 -tambahkan diagram arsitektur sederhana
 
+tolong tambahkan dan sesuaikan degan hal dibawah ini pada file proposal-teknis-cc-smopi.md dan juga pada file requirement cc-smopi.md:
 
++ mobile apps (pake Progressive Web App (PWA))
++ integrasi dengan aplikasi forecasting ketersediaan (HIGERTECH)
++ integrasi dengan dashboard manganti (OPSHI)
+
+untuk kedua integrasi tersebut itu, kami tim keenos yg akan mengubah source code mereka dari
+sebelumnya mereka menggunakan data dari SMOPI lama menggunakan data dari smopi yang baru akan dibuat ini
+ 
 
 
 
