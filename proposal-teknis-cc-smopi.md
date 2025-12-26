@@ -8,35 +8,36 @@ Tanggal: 25 Desember 2025
 ---
 
 ## 1. Ringkasan Eksekutif
-BBWS Citanduy telah memiliki Command Center dengan Bigboard dan Dashboard, namun saat ini belum terintegrasi dengan sistem SMOPI sehingga terjadi perbedaan data pada beberapa aspek (contoh utama: **debit kebutuhan air pada petak tersier**). Selain itu, aplikasi SMOPI yang berjalan memiliki kendala usability (UI/UX), navigasi, performa, keamanan, serta keterbatasan fitur (mis. export Excel) dan beberapa bug.
+BBWS Citanduy telah memiliki Command Center (Bigboard dan Dashboard). Namun, hingga saat ini Command Center belum terintegrasi dengan sistem SMOPI sehingga terdapat perbedaan data pada beberapa aspek; salah satu yang paling krusial adalah **debit kebutuhan air pada petak tersier**. Di sisi lain, aplikasi SMOPI yang berjalan juga menghadapi kendala dari sisi usability (UI/UX), navigasi, performa, keamanan, keterbatasan fitur (mis. export Excel), serta sejumlah bug.
 
 PT Keen Optima Solution mengusulkan:
-- **Remake aplikasi web SMOPI** (perbaikan UI/UX, navigasi, performa, security, serta perbaikan bug).
+- **Remake aplikasi web SMOPI** (perbaikan UI/UX, navigasi, performa, penguatan keamanan, serta perbaikan bug).
 - **Progressive Web App (PWA)** untuk akses mobile yang optimal, memungkinkan instalasi aplikasi di perangkat mobile.
 - **Integrasi parsial** antara SMOPI dan Command Center untuk dataset tertentu, dengan prioritas sinkronisasi **debit kebutuhan air pada petak tersier** agar angka pada Command Center konsisten dengan SMOPI.
 - **Integrasi telemetri via API Command Center** untuk mengurangi input manual pada blangko yang membutuhkan data debit (telemetri petak tersier dan telemetri bendung), dengan tetap menyediakan mekanisme penyesuaian manual jika telemetri bermasalah.
-- **Integrasi dengan aplikasi forecasting milik HIGHERTECH** dan **dashboard OPSHI** (Manganti) dengan menyediakan API/endpoint data yang diperlukan. Tim Keen Optima Solution akan melakukan modifikasi source code aplikasi HIGHERTECH dan OPSHI agar menggunakan data dari SMOPI baru.
+- **Integrasi dengan aplikasi forecasting milik HIGHERTECH** dan **dashboard OPSHI (Manganti)** melalui penyediaan API/endpoint data yang diperlukan. Tim Keen Optima Solution akan melakukan modifikasi kode sumber aplikasi HIGHERTECH dan OPSHI agar menggunakan data dari SMOPI baru.
 - **Implementasi fitur export Excel** (difokuskan pada Blangko 04-O fase 1) dan cetak PDF untuk blangko-blangko lainnya, guna mengurangi beban kerja manual petugas dalam penyiapan laporan.
 
-Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Server Components)** dengan **TypeScript 5.6+**, dan dioptimalkan sebagai **Progressive Web App** untuk mendukung akses mobile. Target durasi pekerjaan: **1 bulan**.
+Aplikasi akan dibangun sebagai aplikasi web menggunakan **Next.js 15 (App Router + Server Components)** dengan **TypeScript 5.6+**, serta dioptimalkan sebagai **Progressive Web App (PWA)** untuk mendukung akses mobile. Target durasi pekerjaan: **1 bulan**.
 
 ---
 
 ## 2. Latar Belakang dan Permasalahan
+Bagian ini menjelaskan kondisi eksisting yang menjadi dasar perlunya integrasi antara Command Center BBWS Citanduy dan SMOPI, sekaligus kebutuhan perbaikan aplikasi SMOPI dari sisi data, proses operasional, dan kualitas aplikasi. Fokus utama permasalahan adalah ketidakkonsistenan dataset kritikal (khususnya debit kebutuhan air pada petak tersier), keterbatasan akses telemetri yang berdampak pada input manual, serta hambatan UI/UX, performa, keamanan, dan stabilitas yang mengganggu workflow lapangan.
 ### 2.1 Kondisi Saat Ini
-- SMOPI belum terintegrasi dengan sistem Command Center sehingga terdapat perbedaan data (khususnya debit kebutuhan air).
-- Aplikasi forecasting milik HIGHERTECH dan dashboard OPSHI (Manganti) masih mengambil data dari SMOPI lama yang belum terintegrasi dengan Command Center, sehingga terjadi inkonsistensi data antar sistem.
-- Akses telemetri belum tersedia pada SMOPI sehingga data debit perlu diinput manual (default kosong/0).
-- UI/UX kurang baik, navigasi membingungkan, beberapa tabel terpotong dan menyulitkan pengisian.
-- Performa website lambat.
-- Keamanan website kurang baik.
-- Terdapat bug pada beberapa menu (contoh: detail daftar TMT bangunan, data tidak muncul pada menu tertentu, duplikasi navbar).
-- Tidak ada fitur export Excel (menambah beban kerja operasional).
+- Integrasi data SMOPI–Command Center belum tersedia, sehingga terjadi perbedaan angka pada dataset kritikal (terutama debit kebutuhan air pada petak tersier).
+- Aplikasi forecasting milik HIGHERTECH dan dashboard OPSHI (Manganti) masih mengonsumsi data dari SMOPI versi lama; kondisi ini menimbulkan inkonsistensi data antar platform dan menyulitkan proses validasi.
+- Mekanisme pengambilan data telemetri belum terimplementasi di SMOPI; akibatnya pencatatan debit pada blangko terkait masih bergantung pada input manual dan berpotensi default kosong/0.
+- Pengalaman pengguna (UI/UX) belum mendukung workflow operasional: navigasi tidak intuitif, tampilan tabel terpotong pada beberapa perangkat, dan proses pengisian menjadi tidak efisien.
+- Kinerja aplikasi belum optimal: waktu muat halaman serta respon interaksi (khususnya pada tabel besar) cenderung lambat.
+- Kontrol keamanan aplikasi belum memadai (mis. penguatan akses, proteksi endpoint, dan hardening aplikasi), sehingga meningkatkan risiko akses tidak sah.
+- Stabilitas fungsional belum konsisten: terdapat bug pada beberapa menu (mis. detail daftar TMT bangunan tidak tampil, data tidak muncul pada menu tertentu, dan duplikasi navbar).
+- Fitur keluaran data masih terbatas: belum tersedia export Excel, sehingga menambah beban kerja operasional dalam penyusunan laporan.
 
 ### 2.2 Tujuan
-- Mewujudkan **konsistensi data** antara Command Center dan SMOPI untuk dataset prioritas (debit kebutuhan air pada petak tersier).
-- Meningkatkan **efektivitas operasional** melalui integrasi telemetri dan perbaikan UI/UX.
-- Meningkatkan **kualitas aplikasi** dari sisi performa, keamanan, dan stabilitas.
+- Mewujudkan **konsistensi data** antara Command Center dan SMOPI untuk dataset prioritas, khususnya **debit kebutuhan air pada petak tersier**, melalui kontrak data dan mekanisme sinkronisasi yang dapat diaudit.
+- Meningkatkan **efektivitas operasional** melalui integrasi telemetri (pre-fill) pada blangko terkait, disertai mekanisme fallback/penyesuaian manual untuk menjaga kelancaran operasional saat telemetri bermasalah.
+- Meningkatkan **kualitas aplikasi** dari sisi UI/UX, performa, keamanan, dan stabilitas agar mendukung workflow lapangan serta meminimalkan hambatan saat input dan rekap data.
 
 ---
 
@@ -47,16 +48,16 @@ Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Se
   - Instalasi aplikasi di perangkat mobile (iOS/Android).
   - Notifikasi push (jika diperlukan).
   - Performa optimal di perangkat mobile.
-- Implementasi modul dan blangko sesuai requirement fungsional (Modul 1–14).
+- Implementasi modul dan blangko sesuai kebutuhan fungsional (Modul 1–14).
 - Integrasi parsial SMOPI → Command Center untuk dataset prioritas: **debit kebutuhan air pada petak tersier**.
 - Integrasi telemetri Command Center → SMOPI melalui API untuk:
   - Blangko 06-O (telemetri petak tersier, sebagai default/pre-fill realisasi debit harian).
   - Blangko 08-O (telemetri bendung, debit sungai).
 - **Integrasi dengan aplikasi eksternal:**
-  - **Aplikasi forecasting milik HIGHERTECH**: menyediakan endpoint/API untuk data yang diperlukan oleh aplikasi forecasting tersebut, serta modifikasi source code aplikasi HIGHERTECH agar menggunakan SMOPI baru sebagai sumber data.
-  - **Dashboard OPSHI/Manganti**: menyediakan endpoint/API untuk data dashboard, serta modifikasi source code OPSHI agar menggunakan SMOPI baru sebagai sumber data.
-- Perbaikan UI/UX (navigasi, layout tabel, aksesibilitas), performa, security hardening, dan perbaikan bug.
-- Export Excel **difokuskan pada Blangko 04-O** (sesuai kesepakatan fase 1). Untuk blangko lain, fitur keluaran pada fase 1 mengikuti kebutuhan minimal berupa **cetak PDF** sesuai requirement.
+  - **Aplikasi forecasting milik HIGHERTECH**: penyediaan endpoint/API untuk data yang diperlukan, serta modifikasi kode sumber aplikasi HIGHERTECH agar menggunakan SMOPI baru sebagai sumber data.
+  - **Dashboard OPSHI/Manganti**: penyediaan endpoint/API untuk data dashboard, serta modifikasi kode sumber OPSHI agar menggunakan SMOPI baru sebagai sumber data.
+- Perbaikan UI/UX (navigasi, tata letak tabel, aksesibilitas), performa, penguatan keamanan (hardening), dan perbaikan bug.
+- Export Excel **difokuskan pada Blangko 04-O** (sesuai kesepakatan fase 1). Untuk blangko lain, fitur keluaran pada fase 1 mengikuti kebutuhan minimal berupa **cetak PDF** sesuai kebutuhan.
 
 ### 3.2 Out-of-Scope (Fase Berikutnya)
 - Soil Analyzer (Modul 13) sebagai pengembangan selanjutnya.
@@ -66,9 +67,9 @@ Aplikasi akan dibangun sebagai website menggunakan **Next.js 15 (App Router + Se
 ---
 
 ## 4. Asumsi dan Ketergantungan
-- Command Center menyediakan **telemetri melalui API** (credential, endpoint, dokumentasi, serta mapping ID lokasi) dan dapat diakses dari lingkungan SMOPI baru.
-- Data master dan referensi yang diperlukan untuk pemetaan petak tersier/bendung (kode DI, id petak, id bangunan, id bendung) tersedia dan dapat disinkronkan/dipetakan.
-- Tidak ada modul khusus “sidang komisi”/workflow komisi terpisah di dalam aplikasi; nilai “Keputusan Komisi Irigasi” dikelola sebagai data input yang diisikan oleh pihak berwenang (diasumsikan role **pengamat**) sesuai hasil sidang/keputusan yang berlaku.
+- Command Center menyediakan **telemetri melalui API** (kredensial akses, endpoint, dokumentasi, serta pemetaan ID lokasi) dan dapat diakses dari lingkungan SMOPI baru.
+- Data master dan referensi yang diperlukan untuk pemetaan petak tersier/bendung (kode DI, ID petak, ID bangunan, ID bendung) tersedia serta dapat disinkronkan/dipetakan.
+- Tidak ada modul khusus “sidang komisi”/workflow komisi terpisah di dalam aplikasi; nilai “Keputusan Komisi Irigasi” dikelola sebagai data input yang diisikan oleh pihak berwenang (diasumsikan peran **pengamat**) sesuai hasil sidang/keputusan yang berlaku.
 
 ---
 
@@ -116,33 +117,33 @@ flowchart TB
 
 ### 5.3 Teknologi dan Komponen Utama
 
-**Frontend Technology Stack:**
-- **Framework**: Next.js 15 (App Router + Server Components)
-- **Language**: TypeScript 5.6+ (strictly typed)
-- **Styling**: Tailwind CSS 4.0 + CSS Modules
-- **UI Components**: shadcn/ui (primary), Headless UI (fallback), custom (last resort)
-- **Charts**: Recharts (default) → D3.js/Observable Plot (untuk visualisasi kompleks)
-- **Maps**: Google Maps JavaScript API + @react-google-maps/api
-- **Geospatial Operations**: @turf/turf untuk operasi buffer, intersect, dll.
-- **Animations**: Framer Motion + Lottie React
-- **Icons**: Lucide React + Heroicons
-- **PWA**: Next-PWA + Workbox
+Frontend Technology Stack:
+- Framework: Next.js 15 (App Router + Server Components)
+- Language: TypeScript 5.6+ (strictly typed)
+- Styling: Tailwind CSS 4.0 + CSS Modules
+- UI Components: shadcn/ui (primary), Headless UI (fallback), custom (last resort)
+- Charts: Recharts (default) → D3.js/Observable Plot (untuk visualisasi kompleks)
+- Maps: Google Maps JavaScript API + @react-google-maps/api
+- Geospatial Operations: @turf/turf untuk operasi buffer, intersect, dll.
+- Animations: Framer Motion + Lottie React
+- Icons: Lucide React + Heroicons
+- PWA: Next-PWA + Workbox
 
-**Backend Technology Stack:**
-- **Runtime**: Node.js 20+ LTS
-- **Framework**: Next.js 15 Route Handlers (REST API)
-- **Database**: PostgreSQL + Prisma ORM (dengan ekstensi PostGIS untuk data spasial)
-- **Authentication**: NextAuth.js (JWT + Sessions)
-- **Authorization**: Role-based access control (RBAC) untuk 4 role (pengamat, juru, POB utama, POB suplesi)
-- **Validation**: Zod (validasi semua input/output)
-- **API Documentation**: OpenAPI 3.1
-- **Security**: Helmet (untuk microservices terpisah bila ada), CORS, Rate Limiting
+Backend Technology Stack:
+- Runtime: Node.js 20+ LTS
+- Framework: Next.js 15 Route Handlers (REST API)
+- Database: PostgreSQL + Prisma ORM (dengan ekstensi PostGIS untuk data spasial)
+- Authentication: NextAuth.js (JWT + Sessions)
+- Authorization: Role-based access control (RBAC) untuk 4 role (pengamat, juru, POB utama, POB suplesi)
+- Validation: Zod (validasi semua input/output)
+- API Documentation: OpenAPI 3.1
+- Security: Helmet (untuk microservices terpisah bila ada), CORS, Rate Limiting
 
-**Export & Reporting:**
+Export & Reporting:
 - Excel khusus Blangko 04-O menggunakan `exceljs`
 - PDF untuk blangko yang mensyaratkan cetak (menggunakan library rendering PDF yang sesuai)
 
-**Integrasi:**
+Integrasi:
 - Konsumsi API telemetri Command Center
 - Publikasi endpoint/kontrak data debit kebutuhan air untuk Bigboard/Dashboard Command Center
 
@@ -596,4 +597,4 @@ Bagian ini memuat seluruh requirement fungsional berdasarkan dokumen kebutuhan.
 ---
 
 ## 14. Penutup
-Proposal ini dirancang untuk menyelesaikan kebutuhan utama BBWS Citanduy: (1) konsistensi data prioritas antara SMOPI dan Command Center (debit kebutuhan air petak tersier), (2) peningkatan kualitas SMOPI melalui remake web yang lebih mudah digunakan, lebih cepat, dan lebih aman, (3) akses mobile yang optimal melalui Progressive Web App, serta (4) integrasi dengan aplikasi eksternal (aplikasi forecasting milik HIGHERTECH dan dashboard OPSHI) untuk ekosistem pengelolaan sumber daya air yang lebih terintegrasi.
+Proposal ini disusun untuk menjawab kebutuhan utama BBWS Citanduy, yaitu: (1) memastikan konsistensi data prioritas antara SMOPI dan Command Center, khususnya debit kebutuhan air pada petak tersier; (2) meningkatkan kualitas aplikasi SMOPI melalui remake aplikasi web yang lebih mudah digunakan, lebih cepat, lebih aman, dan lebih stabil; (3) menyediakan akses mobile yang optimal melalui Progressive Web App (PWA); serta (4) mendukung integrasi dengan aplikasi eksternal (forecasting HIGHERTECH dan dashboard OPSHI/Manganti) guna membentuk ekosistem pengelolaan sumber daya air yang lebih terintegrasi.
